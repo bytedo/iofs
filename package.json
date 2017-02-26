@@ -1,0 +1,19 @@
+{
+    "name": "iofs",
+    "version": "1.0.0",
+    "description": "Base on native fs module, for easy using.",
+    "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yutent/iofs.git"
+    },
+    "keywords": [
+        "dojs",
+        "fs",
+        "iofs",
+        "fs.io",
+        "file"
+    ],
+    "author": "yutent",
+    "license": "MIT"
+}
