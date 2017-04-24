@@ -32,12 +32,27 @@ class Iofs {
 
     /**
      * [ls 读取整个目录(不遍历子目录)]
-     * @param  {string} file [目标路径]
+     * @param  {string} dir [目标路径]
+     * @param  {boolean} child [是否遍历子目录]
      * @return {array}      [返回目标目录所有文件名和子目录名, 不包括'.'和'..']
      */
-    ls(file){
+    ls(dir, child){
         try{
-            return fs.readdirSync(file)
+            let list = fs.readdirSync(dir)
+
+            if(!child)
+                return list
+
+            let tmp = Array.from(list)
+            tmp.forEach(it => {
+                let childdir = path.join(dir, it)
+                if(this.isdir(childdir)){
+                    list = Array.prototype.concat.apply(list, this.ls(childdir, true).map(sub => {
+                            return path.join(it, sub)
+                    }))
+                }
+            })
+            return list
         }catch(err){
             console.error(err)
             return null

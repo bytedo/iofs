@@ -19,10 +19,12 @@
 
 
 
-### ls(path)
+### ls(path, child)
 - path `<String>`
+- child `<Boolean>`
 
 > List all files and folders of the path given exclude '.' and '..'. I t return an array.
+> If para `child` is set to be ture, it will recur list all files of child dir.
 
 
 ### echo(data, file[, append][, encode])
