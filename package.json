@@ -1,6 +1,6 @@
 {
   "name": "iofs",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Base on native fs module, for easy using.",
   "main": "index.js",
   "repository": {

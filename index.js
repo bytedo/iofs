@@ -6,8 +6,8 @@
  */
 'use strict'
 
-const fs = require('fs'),
-  path = require('path')
+const fs = require('fs')
+const path = require('path')
 
 class Iofs {
   constructor() {
@@ -139,7 +139,6 @@ class Iofs {
       ws = fs.createWriteStream(to)
 
     rs.pipe(ws)
-    rs.on('end', err => console.error(err))
   }
 
   /**
