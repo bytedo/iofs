@@ -1,3 +1,11 @@
+# 1.1.0 / 2018-05-24
+
+* [add] add error log output
+* optimize `ls` method
+* rename `this.self` to `this.origin`
+
+
+
 # 1.0.3 / 2017-12-23
 
 * [del] delete the log output

@@ -6,12 +6,12 @@
  */
 'use strict'
 
-const fs = require('fs')
-const path = require('path')
+const FS = require('fs')
+const PATH = require('path')
 
 class Iofs {
   constructor() {
-    this.self = fs
+    this.origin = FS
   }
 
   /**
@@ -21,9 +21,11 @@ class Iofs {
    */
   cat(file) {
     try {
-      return fs.readFileSync(file)
+      return FS.readFileSync(file)
     } catch (err) {
-      console.error(err)
+      if (err) {
+        console.error(err + '')
+      }
       return null
     }
   }
@@ -36,25 +38,27 @@ class Iofs {
    */
   ls(dir, child) {
     try {
-      let list = fs.readdirSync(dir)
+      let list = FS.readdirSync(dir)
 
-      if (!child) return list
+      list = list.map(it => {
+        return PATH.resolve(dir, it)
+      })
 
-      let tmp = Array.from(list)
+      if (!child) {
+        return list
+      }
+
+      let tmp = list.concat()
       tmp.forEach(it => {
-        let childdir = path.join(dir, it)
-        if (this.isdir(childdir)) {
-          list = Array.prototype.concat.apply(
-            list,
-            this.ls(childdir, true).map(sub => {
-              return path.join(it, sub)
-            })
-          )
+        if (this.isdir(it)) {
+          list = list.concat(this.ls(it, true))
         }
       })
       return list
     } catch (err) {
-      console.error(err)
+      if (err) {
+        console.error(err + '')
+      }
       return null
     }
   }
@@ -71,8 +75,8 @@ class Iofs {
       return data
     }
 
-    let updir = path.parse(file).dir,
-      opt = {}
+    let updir = PATH.parse(file).dir
+    let opt = {}
     if (!this.isdir(updir)) {
       this.mkdir(updir)
     }
@@ -89,77 +93,84 @@ class Iofs {
 
     try {
       if (!!append) {
-        fs.appendFileSync(file, data, opt)
+        FS.appendFileSync(file, data, opt)
       } else {
-        fs.writeFileSync(file, data, opt)
+        FS.writeFileSync(file, data, opt)
       }
     } catch (err) {
-      console.error(err)
+      if (err) {
+        console.error(err + '')
+      }
     }
   }
 
   //修改权限
   chmod(path, mode) {
     try {
-      fs.chmodSync(path, mode)
+      FS.chmodSync(path, mode)
     } catch (err) {
-      console.error(err)
+      if (err) {
+        console.error(err + '')
+      }
     }
   }
 
   /**
    * [mv 移动文件,兼具重命名功能]
-   * @param  {String} from [原路径/原名]
-   * @param  {String} to   [目标路径/新名]
+   * @param  {String} origin [原路径/原名]
+   * @param  {String} target   [目标路径/新名]
    */
-  mv(from, to) {
-    let updir = path.parse(to).dir
-    if (!this.isdir(updir)) this.mkdir(updir)
-
-    try {
-      fs.renameSync(from, to)
-    } catch (e) {
-      let rs = fs.createReadStream(from),
-        ws = fs.createWriteStream(to)
-
-      rs.pipe(ws)
-      rs.on('end', err => {
-        this.rm(from)
-      })
-    }
-  }
-
-  cp(from, to) {
-    let updir = path.parse(to).dir
+  mv(origin, target) {
+    let updir = PATH.parse(target).dir
     if (!this.isdir(updir)) {
       this.mkdir(updir)
     }
 
-    let rs = fs.createReadStream(from),
-      ws = fs.createWriteStream(to)
+    try {
+      FS.renameSync(origin, target)
+    } catch (e) {
+      let rs = FS.createReadStream(origin)
+      let ws = FS.createWriteStream(target)
+
+      rs.pipe(ws)
+      rs.on('end', err => {
+        this.rm(origin)
+      })
+    }
+  }
+
+  cp(origin, target) {
+    let updir = PATH.parse(target).dir
+    if (!this.isdir(updir)) {
+      this.mkdir(updir)
+    }
+
+    let rs = FS.createReadStream(origin)
+    let ws = FS.createWriteStream(target)
 
     rs.pipe(ws)
   }
 
   /**
    * [rm 删除文件/目录]
-   * @param  {[type]} from      [源文件/目录路径]
+   * @param  {[type]} origin      [源文件/目录路径]
    * @param  {[type]} recursion [是否递归删除，若删除目录，此值须为true]
    */
-  rm(from, recursion) {
+  rm(origin, recursion) {
     try {
       if (!!recursion) {
-        let list = this.ls(from)
+        let list = this.ls(origin)
         list.forEach(it => {
-          it = path.resolve(from, it)
           this.rm(it, this.isdir(it))
         })
-        fs.rmdirSync(from)
+        FS.rmdirSync(origin)
       } else {
-        fs.unlinkSync(from)
+        FS.unlinkSync(origin)
       }
     } catch (err) {
-      console.error(err)
+      if (err) {
+        console.error(err + '')
+      }
     }
   }
 
@@ -169,7 +180,7 @@ class Iofs {
    */
   stat(path) {
     try {
-      return fs.statSync(path)
+      return FS.statSync(path)
     } catch (err) {
       return null
     }
@@ -192,17 +203,21 @@ class Iofs {
    * @param  {String} dir [目标路径]
    */
   mkdir(dir) {
-    let updir = path.parse(dir).dir
-    if (!updir) return
+    let updir = PATH.parse(dir).dir
+    if (!updir) {
+      return
+    }
 
     if (!this.isdir(updir)) {
       this.mkdir(updir)
     }
 
     try {
-      fs.mkdirSync(dir)
+      FS.mkdirSync(dir)
     } catch (err) {
-      console.error(err)
+      if (err) {
+        console.error(err + '')
+      }
     }
   }
 
@@ -211,7 +226,7 @@ class Iofs {
    * @param  {String} file [目标路径]
    */
   exists(file) {
-    return fs.existsSync(file)
+    return FS.existsSync(file)
   }
 }
 
