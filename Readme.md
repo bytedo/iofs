@@ -1,30 +1,30 @@
 ![module info](https://nodei.co/npm/iofs.png?downloads=true&downloadRank=true&stars=true)
 
 # iofs
-> `iofs` is a bash-like module for reading and writing files on Node.js. It base on Node.js's native `fs` module.
+> `iofs`是一个基于原生`fs`模块封装的工具, 旨在提供更加方便实用一些常用的API方法(同步), API习惯参考了`bash shell`, 习惯用命令行的朋友, 可能会比较亲切。
 
-## property
+## 属性 
 
-### self
-> It return the native `fs` module for more requests.
-
-
-
-## API
-
-### cat(file)
-- file `<String>`
-
-> Just like bash's cat, it will read a file and return a Buffer.
+### origin
+> 返回原生的`fs`模块对象, 方便调用一些未封装的额外功能
 
 
 
-### ls(path, child)
+## APIs
+
+### .cat(file)
+- file `<String>` 文件路径
+
+> 读取文件, 返回一个`Buffer对象`
+
+
+
+### .ls(path, recursion)
 - path `<String>`
-- child `<Boolean>`
+- recursion `<Boolean>`
 
-> List all files and folders of the path given exclude '.' and '..'. I t return an array.
-> If para `child` is set to be ture, it will recur list all files of child dir.
+> 列出指定目录下的所有文件&目录, 不包括 '.' and '..'. 结果返回一个数组.
+> 如果参数`recursion`设为ture, 则会递归遍历所有子目录.
 
 
 ### echo(data, file[, append][, encode])
@@ -33,16 +33,16 @@
 - append `<Boolean>` optional
 - encode `<String>` optional
 
-> Write/Append data to a file. creating the file if it does not yet exist.
-> If `append` is set true, it will append data to the file.
-> Default `encode` is utf8.
+> 写数据到指定文件中. 如果指定文件不存在, 则自动生成.
+> 如果`append`设为true, 则往文件后面追加数据, 不会覆盖.
+> `encode`为指定编码, 默认utf8.
 
 ```javascript
-let fs = require('iofs')
+var fs = require('iofs')
 
-fs.echo('hello ', 'test.txt') // replacing test.txt if it exists.
+fs.echo('hello ', 'test.txt') // 如果test.txt存在, 则覆盖.
 
-fs.echo('world', 'test.txt', true) // append the data to test.txt
+fs.echo('world', 'test.txt', true) // 不会覆盖, 只会追加到 test.txt中
 
 ```
 
@@ -53,11 +53,11 @@ fs.echo('world', 'test.txt', true) // append the data to test.txt
 - file `<String>` | `<Buffer>`
 - mode `<Integer>`
 
-> Changes the mode of the file specified whose pathname is given.
+> 修改文件&目录的权限.
 
 ```javascript
 
-fs.chmod('test.txt', 777) // replacing test.txt if it exists.
+fs.chmod('test.txt', 777)
 
 ```
 
@@ -66,7 +66,7 @@ fs.chmod('test.txt', 777) // replacing test.txt if it exists.
 - from `<String>`
 - to `<String>`
 
-> Move a fil to the target location. It can also use to renaming a file.
+> 移动文件, 支持跨磁盘移动; 同时具备重命名功能。
 
 
 
@@ -74,7 +74,7 @@ fs.chmod('test.txt', 777) // replacing test.txt if it exists.
 - from `<String>`
 - to `<String>`
 
-> Copy a fil to the target location.
+> 复制文件.
 
 
 
@@ -82,7 +82,7 @@ fs.chmod('test.txt', 777) // replacing test.txt if it exists.
 - path `<String>`
 - recursion `<Boolean>`
 
-> Delete a file or a folder. If path is a folder, `recursion` must be set to true.
+> 删除文件&目录, 如果要递归删除所以子目录 `recursion`必须设为true.
 
 ```javascript
 
@@ -97,24 +97,24 @@ fs.rm('./foo', true)
 ### stat(path)
 - path `<String>`
 
-> Returns an instance of fs.Stats.
+> 返回文件的状态信息, 如修改时间, 文件大小等
 
 
 ### isdir(path)
 - path `<String>`
 
-> Return true if the path is a folder, and false when it is a file or not yet exists.
+> 判断指定目录是否为一个目录, 路径不存在或者不是目录都会返回 false.
 
 
 
 ### mkdir(path)
 - path `<String>`
 
-> Build a folder in where you want.
+> 创建目录, 可自动创建上级目录(如不存在)
 
 
 
 ### exists(path)
 - path `<String>`
 
-> Return true if the path exists, and false not.
+> 判断文件&目录是否存在

@@ -1,23 +1,28 @@
-# 1.1.0 / 2018-05-24
+# 1.2.0 / 2019-07-16
+* [U] 优化结构
+* [U] 部分写操作改为异步
 
-* [add] add error log output
-* optimize `ls` method
-* rename `this.self` to `this.origin`
+
+# 1.1.0 / 2018-05-24
+* [A] 增加异常信息输出
+* [U] 优化`ls`API
+* [U] 重命名 `this.self` 为 `this.origin`
 
 
 
 # 1.0.3 / 2017-12-23
+* [D] 删除异常信息输出
 
-* [del] delete the log output
+
 
 # 1.0.2 / 2017-11-20
+* [F] 修复非空目录无法删除的bug
 
-* [fixed] Fixed remove the dir not empty call error.
+
 
 # 1.0.1 / 2017-04-24
+* [A] `ls`方法当第2个参数为`true`的时候,可以遍历子目录
 
-* [add] ls function can recur list child folder with second para set to be true.
 
 # 1.0.0 / 2017-02-26
-
-* new project
+* 初始化项目

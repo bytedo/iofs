@@ -9,10 +9,14 @@
 const FS = require('fs')
 const PATH = require('path')
 
-class Iofs {
-  constructor() {
-    this.origin = FS
+const ERROR_FN = (err, res) => {
+  if (err) {
+    console.error(err)
   }
+}
+
+const Iofs = {
+  origin: FS,
 
   /**
    * [cat 文件读取]
@@ -28,32 +32,30 @@ class Iofs {
       }
       return null
     }
-  }
+  },
 
   /**
    * [ls 读取整个目录(不遍历子目录)]
    * @param  {string} dir [目标路径]
-   * @param  {boolean} child [是否遍历子目录]
+   * @param  {boolean} recursion [是否递归遍历子目录]
    * @return {array}      [返回目标目录所有文件名和子目录名, 不包括'.'和'..']
    */
-  ls(dir, child) {
+  ls(dir, recursion) {
     try {
-      let list = FS.readdirSync(dir)
+      var list = FS.readdirSync(dir)
 
-      list = list.map(it => {
-        return PATH.resolve(dir, it)
+      list.forEach((it, i) => {
+        list[i] = PATH.resolve(dir, it)
       })
 
-      if (!child) {
-        return list
+      if (recursion) {
+        var tmp = list.concat()
+        tmp.forEach(it => {
+          if (this.isdir(it)) {
+            list = list.concat(this.ls(it, true))
+          }
+        })
       }
-
-      let tmp = list.concat()
-      tmp.forEach(it => {
-        if (this.isdir(it)) {
-          list = list.concat(this.ls(it, true))
-        }
-      })
       return list
     } catch (err) {
       if (err) {
@@ -61,7 +63,7 @@ class Iofs {
       }
       return null
     }
-  }
+  },
 
   /**
    * [echo 写文件]
@@ -75,8 +77,8 @@ class Iofs {
       return data
     }
 
-    let updir = PATH.parse(file).dir
-    let opt = {}
+    var updir = PATH.parse(file).dir
+    var opt = {}
     if (!this.isdir(updir)) {
       this.mkdir(updir)
     }
@@ -91,29 +93,17 @@ class Iofs {
       }
     }
 
-    try {
-      if (!!append) {
-        FS.appendFileSync(file, data, opt)
-      } else {
-        FS.writeFileSync(file, data, opt)
-      }
-    } catch (err) {
-      if (err) {
-        console.error(err + '')
-      }
+    if (!!append) {
+      FS.appendFile(file, data, opt, ERROR_FN)
+    } else {
+      FS.writeFile(file, data, opt, ERROR_FN)
     }
-  }
+  },
 
   //修改权限
   chmod(path, mode) {
-    try {
-      FS.chmodSync(path, mode)
-    } catch (err) {
-      if (err) {
-        console.error(err + '')
-      }
-    }
-  }
+    FS.chmod(path, mode, ERROR_FN)
+  },
 
   /**
    * [mv 移动文件,兼具重命名功能]
@@ -121,35 +111,35 @@ class Iofs {
    * @param  {String} target   [目标路径/新名]
    */
   mv(origin, target) {
-    let updir = PATH.parse(target).dir
+    var updir = PATH.parse(target).dir
     if (!this.isdir(updir)) {
       this.mkdir(updir)
     }
 
-    try {
-      FS.renameSync(origin, target)
-    } catch (e) {
-      let rs = FS.createReadStream(origin)
-      let ws = FS.createWriteStream(target)
+    FS.rename(origin, target, err => {
+      if (err) {
+        var rs = FS.createReadStream(origin)
+        var ws = FS.createWriteStream(target)
 
-      rs.pipe(ws)
-      rs.on('end', err => {
-        this.rm(origin)
-      })
-    }
-  }
+        rs.pipe(ws)
+        rs.on('end', err => {
+          this.rm(origin)
+        })
+      }
+    })
+  },
 
   cp(origin, target) {
-    let updir = PATH.parse(target).dir
+    var updir = PATH.parse(target).dir
     if (!this.isdir(updir)) {
       this.mkdir(updir)
     }
 
-    let rs = FS.createReadStream(origin)
-    let ws = FS.createWriteStream(target)
+    var rs = FS.createReadStream(origin)
+    var ws = FS.createWriteStream(target)
 
     rs.pipe(ws)
-  }
+  },
 
   /**
    * [rm 删除文件/目录]
@@ -157,22 +147,16 @@ class Iofs {
    * @param  {[type]} recursion [是否递归删除，若删除目录，此值须为true]
    */
   rm(origin, recursion) {
-    try {
-      if (!!recursion) {
-        let list = this.ls(origin)
-        list.forEach(it => {
-          this.rm(it, this.isdir(it))
-        })
-        FS.rmdirSync(origin)
-      } else {
-        FS.unlinkSync(origin)
-      }
-    } catch (err) {
-      if (err) {
-        console.error(err + '')
-      }
+    if (recursion) {
+      var list = this.ls(origin)
+      list.forEach(it => {
+        this.rm(it, this.isdir(it))
+      })
+      FS.rmdir(origin, ERROR_FN)
+    } else {
+      FS.unlink(origin, ERROR_FN)
     }
-  }
+  },
 
   /**
    * [stat 返回文件/目录的状态信息]
@@ -184,7 +168,7 @@ class Iofs {
     } catch (err) {
       return null
     }
-  }
+  },
 
   /**
    * [isdir 判断目标是否为目录]
@@ -196,14 +180,14 @@ class Iofs {
     } catch (err) {
       return false
     }
-  }
+  },
 
   /**
    * [mkdir 新建目录]
    * @param  {String} dir [目标路径]
    */
   mkdir(dir) {
-    let updir = PATH.parse(dir).dir
+    var updir = PATH.parse(dir).dir
     if (!updir) {
       return
     }
@@ -212,14 +196,8 @@ class Iofs {
       this.mkdir(updir)
     }
 
-    try {
-      FS.mkdirSync(dir)
-    } catch (err) {
-      if (err) {
-        console.error(err + '')
-      }
-    }
-  }
+    FS.mkdir(dir, ERROR_FN)
+  },
 
   /**
    * [exists 判断目标(文件/目录)是否存在]
@@ -230,4 +208,4 @@ class Iofs {
   }
 }
 
-module.exports = new Iofs()
+module.exports = Iofs
