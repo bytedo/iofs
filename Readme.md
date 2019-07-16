@@ -82,7 +82,7 @@ fs.chmod('test.txt', 777)
 - path `<String>`
 - recursion `<Boolean>`
 
-> 删除文件&目录, 如果要递归删除所以子目录 `recursion`必须设为true.
+> 删除文件, 如果要删除目录&子目录, `recursion`必须设为true.
 
 ```javascript
 
