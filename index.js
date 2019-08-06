@@ -94,15 +94,15 @@ const Iofs = {
     }
 
     if (!!append) {
-      FS.appendFile(file, data, opt, ERROR_FN)
+      FS.appendFileSync(file, data, opt, ERROR_FN)
     } else {
-      FS.writeFile(file, data, opt, ERROR_FN)
+      FS.writeFileSync(file, data, opt, ERROR_FN)
     }
   },
 
   //修改权限
   chmod(path, mode) {
-    FS.chmod(path, mode, ERROR_FN)
+    FS.chmodSync(path, mode, ERROR_FN)
   },
 
   /**
@@ -152,9 +152,9 @@ const Iofs = {
       list.forEach(it => {
         this.rm(it, this.isdir(it))
       })
-      FS.rmdir(origin, ERROR_FN)
+      FS.rmdirSync(origin, ERROR_FN)
     } else {
-      FS.unlink(origin, ERROR_FN)
+      FS.unlinkSync(origin, ERROR_FN)
     }
   },
 
@@ -196,7 +196,7 @@ const Iofs = {
       this.mkdir(updir)
     }
 
-    FS.mkdir(dir, ERROR_FN)
+    FS.mkdirSync(dir, ERROR_FN)
   },
 
   /**
