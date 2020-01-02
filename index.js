@@ -9,12 +9,6 @@
 const FS = require('fs')
 const PATH = require('path')
 
-const ERROR_FN = (err, res) => {
-  if (err) {
-    console.error(err)
-  }
-}
-
 const Iofs = {
   origin: FS,
 
@@ -94,15 +88,15 @@ const Iofs = {
     }
 
     if (!!append) {
-      FS.appendFileSync(file, data, opt, ERROR_FN)
+      FS.appendFileSync(file, data, opt)
     } else {
-      FS.writeFileSync(file, data, opt, ERROR_FN)
+      FS.writeFileSync(file, data, opt)
     }
   },
 
   //修改权限
   chmod(path, mode) {
-    FS.chmodSync(path, mode, ERROR_FN)
+    FS.chmodSync(path, mode)
   },
 
   /**
@@ -152,9 +146,9 @@ const Iofs = {
       list.forEach(it => {
         this.rm(it, this.isdir(it))
       })
-      FS.rmdirSync(origin, ERROR_FN)
+      FS.rmdirSync(origin)
     } else {
-      FS.unlinkSync(origin, ERROR_FN)
+      FS.unlinkSync(origin)
     }
   },
 
@@ -196,7 +190,7 @@ const Iofs = {
       this.mkdir(updir)
     }
 
-    FS.mkdirSync(dir, ERROR_FN)
+    FS.mkdirSync(dir)
   },
 
   /**
