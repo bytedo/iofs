@@ -3,28 +3,37 @@
 # iofs
 > `iofs`是一个基于原生`fs`模块封装的工具, 旨在提供更加方便实用一些常用的API方法(同步), API习惯参考了`bash shell`, 习惯用命令行的朋友, 可能会比较亲切。
 
+## 更新日志
+[Change Logs](./History.md)
+
+
 ## 属性 
 
-### origin
+- origin
 > 返回原生的`fs`模块对象, 方便调用一些未封装的额外功能
 
 
 
 ## APIs
 
-### .cat(file)
-- file `<String>` 文件路径
-
+- .cat()
 > 读取文件, 返回一个`Buffer对象`
 
+| 参数 | 类型 | 是否必须 | 说明 |
+| :--: | :--: | :--: | -- |
+| file |  `<String>`  |  是  | 要读取的文件路径 |
 
 
-### .ls(path, recursion)
-- path `<String>`
-- recursion `<Boolean>`
 
+
+- .ls()
 > 列出指定目录下的所有文件&目录, 不包括 '.' and '..'. 结果返回一个数组.
-> 如果参数`recursion`设为ture, 则会递归遍历所有子目录.
+
+| 参数 | 类型 | 是否必须 | 说明 |
+| :--: | :--: | :--: | -- |
+| path |  `<String>`  |  是  | 要读取的目录 |
+| recursive |  `<String>`  |  否  | 是否递归读取 |
+
 
 
 ### echo(data, file[, append][, encode])

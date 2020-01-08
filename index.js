@@ -9,6 +9,11 @@
 const FS = require('fs')
 const PATH = require('path')
 
+const VERSION = +process.versions.node
+  .split('.')
+  .slice(0, 2)
+  .join('.')
+
 const Iofs = {
   origin: FS,
 
@@ -31,10 +36,10 @@ const Iofs = {
   /**
    * [ls 读取整个目录(不遍历子目录)]
    * @param  {string} dir [目标路径]
-   * @param  {boolean} recursion [是否递归遍历子目录]
+   * @param  {boolean} recursive [是否递归遍历子目录]
    * @return {array}      [返回目标目录所有文件名和子目录名, 不包括'.'和'..']
    */
-  ls(dir, recursion) {
+  ls(dir, recursive) {
     try {
       var list = FS.readdirSync(dir)
 
@@ -42,7 +47,7 @@ const Iofs = {
         list[i] = PATH.resolve(dir, it)
       })
 
-      if (recursion) {
+      if (recursive) {
         var tmp = list.concat()
         tmp.forEach(it => {
           if (this.isdir(it)) {
@@ -52,9 +57,7 @@ const Iofs = {
       }
       return list
     } catch (err) {
-      if (err) {
-        console.error(err + '')
-      }
+      console.error(err)
       return null
     }
   },
@@ -87,20 +90,43 @@ const Iofs = {
       }
     }
 
-    if (!!append) {
-      FS.appendFileSync(file, data, opt)
-    } else {
-      FS.writeFileSync(file, data, opt)
+    try {
+      if (!!append) {
+        FS.appendFileSync(file, data, opt)
+      } else {
+        FS.writeFileSync(file, data, opt)
+      }
+      return true
+    } catch (err) {
+      console.error(err)
+      return false
     }
   },
 
   //修改权限
   chmod(path, mode) {
-    FS.chmodSync(path, mode)
+    try {
+      FS.chmodSync(path, mode)
+      return true
+    } catch (err) {
+      console.error(err)
+      return false
+    }
+  },
+
+  //修改所属用户
+  chown(path, uid, gid) {
+    try {
+      FS.chownSync(path, uid, gid)
+      return true
+    } catch (err) {
+      console.error(err)
+      return false
+    }
   },
 
   /**
-   * [mv 移动文件,兼具重命名功能]
+   * [mv 移动文件&目录,兼具重命名功能]
    * @param  {String} origin [原路径/原名]
    * @param  {String} target   [目标路径/新名]
    */
@@ -110,45 +136,74 @@ const Iofs = {
       this.mkdir(updir)
     }
 
-    FS.rename(origin, target, err => {
-      if (err) {
-        var rs = FS.createReadStream(origin)
-        var ws = FS.createWriteStream(target)
-
-        rs.pipe(ws)
-        rs.on('end', err => {
-          this.rm(origin)
-        })
+    try {
+      FS.renameSync(origin, target)
+    } catch (err) {
+      if (~err.message.indexOf('cross-device')) {
+        if (this.cp(origin, target)) {
+          return this.rm(origin)
+        }
+        return false
       }
-    })
+      console.error(err)
+      return false
+    }
   },
 
+  /**
+   * [cp 复制文件&目录]
+   * @param  {String} origin [原路径]
+   * @param  {String} target   [目标路径]
+   */
   cp(origin, target) {
-    var updir = PATH.parse(target).dir
-    if (!this.isdir(updir)) {
-      this.mkdir(updir)
+    try {
+      // 如果是目录, 则递归操作
+      if (this.isdir(origin)) {
+        this.mkdir(target)
+        var list = this.ls(origin)
+        list.forEach(val => {
+          let name = PATH.parse(val).base
+          this.cp(val, PATH.join(target, name))
+        })
+      } else {
+        var updir = PATH.parse(target).dir
+        if (!this.isdir(updir)) {
+          this.mkdir(updir)
+        }
+
+        var rs = FS.createReadStream(origin)
+        var ws = FS.createWriteStream(target)
+        rs.pipe(ws)
+      }
+
+      return true
+    } catch (err) {
+      console.error(err)
+      return false
     }
-
-    var rs = FS.createReadStream(origin)
-    var ws = FS.createWriteStream(target)
-
-    rs.pipe(ws)
   },
 
   /**
    * [rm 删除文件/目录]
    * @param  {[type]} origin      [源文件/目录路径]
-   * @param  {[type]} recursion [是否递归删除，若删除目录，此值须为true]
    */
-  rm(origin, recursion) {
-    if (recursion) {
-      var list = this.ls(origin)
-      list.forEach(it => {
-        this.rm(it, this.isdir(it))
-      })
-      FS.rmdirSync(origin)
-    } else {
-      FS.unlinkSync(origin)
+  rm(origin) {
+    try {
+      if (this.isdir(origin)) {
+        if (VERSION > 12.1) {
+          FS.rmdirSync(origin, { recursive: true })
+        } else {
+          var list = this.ls(origin)
+          list.forEach(it => this.rm(it))
+          FS.rmdirSync(origin)
+        }
+      } else {
+        FS.unlinkSync(origin)
+      }
+      return true
+    } catch (err) {
+      console.error(err)
+      return false
     }
   },
 
@@ -160,6 +215,7 @@ const Iofs = {
     try {
       return FS.statSync(path)
     } catch (err) {
+      console.error(err)
       return null
     }
   },
@@ -172,6 +228,7 @@ const Iofs = {
     try {
       return this.stat(path).isDirectory()
     } catch (err) {
+      console.error(err)
       return false
     }
   },
@@ -179,18 +236,31 @@ const Iofs = {
   /**
    * [mkdir 新建目录]
    * @param  {String} dir [目标路径]
+   * @param {Number} mode [目录权限, node v10.12起支持]
    */
-  mkdir(dir) {
-    var updir = PATH.parse(dir).dir
-    if (!updir) {
-      return
-    }
+  mkdir(dir, mode = 0o755) {
+    try {
+      if (VERSION > 10.12) {
+        FS.mkdirSync(dir, { recursive: true, mode: mode })
+      } else {
+        var updir = PATH.parse(dir).dir
+        if (!updir) {
+          console.error('Wrong dir path')
+          return false
+        }
 
-    if (!this.isdir(updir)) {
-      this.mkdir(updir)
-    }
+        if (!this.isdir(updir)) {
+          this.mkdir(updir)
+        }
 
-    FS.mkdirSync(dir)
+        FS.mkdirSync(dir)
+        this.chmod(dir, mode)
+      }
+      return true
+    } catch (err) {
+      console.error(err)
+      return false
+    }
   },
 
   /**
