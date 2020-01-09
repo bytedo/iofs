@@ -11,18 +11,18 @@
 + props
   - [origin](#origin)
 + methods
-  - [.cat(file)](.cat)
-  - [.ls(path, recursive]](.ls)
-  - [.echo(data, file, append, encode)](.echo)
-  - [.chmod(path, mode)](.chmod)
-  - [.chown(path, uid, gid)](.chown)
-  - [.mv(origin, target)](.mv)
-  - [.cp(origin, target)](.cp)
-  - [.rm(origin)](.rm)
-  - [.stat(path)](.stat)
-  - [.isdir(path)](.isdir)
-  - [.mkdir(dir, mode)](.mkdir)
-  - [.exists(path)](.exists)
+  - [.cat(file)](#.catfile)
+  - [.ls(path, recursive)](#.lspath-recursive)
+  - [.echo(data, file, append, encode)](#.echodata-file-append-encode)
+  - [.chmod(path, mode)](#.chmodpath-mode)
+  - [.chown(path, uid, gid)](#.chownpath-uid-gid)
+  - [.mv(origin, target)](#.mvorigin-target)
+  - [.cp(origin, target)](#.cporigin-target)
+  - [.rm(origin)](#.rmorigin)
+  - [.stat(path)](#.statpath)
+  - [.isdir(path)](#.isdirpath)
+  - [.mkdir(dir, mode)](#.mkdirdir-mode)
+  - [.exists(path)](#.existspath)
 
 
 ## 属性 
