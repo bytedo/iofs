@@ -26,9 +26,7 @@ const Iofs = {
     try {
       return FS.readFileSync(file)
     } catch (err) {
-      if (err) {
-        console.error(err + '')
-      }
+      console.error(err + '')
       return null
     }
   },
@@ -57,7 +55,7 @@ const Iofs = {
       }
       return list
     } catch (err) {
-      console.error(err)
+      console.error(err + '')
       return null
     }
   },
@@ -98,7 +96,7 @@ const Iofs = {
       }
       return true
     } catch (err) {
-      console.error(err)
+      console.error(err + '')
       return false
     }
   },
@@ -109,7 +107,7 @@ const Iofs = {
       FS.chmodSync(path, mode)
       return true
     } catch (err) {
-      console.error(err)
+      console.error(err + '')
       return false
     }
   },
@@ -120,7 +118,7 @@ const Iofs = {
       FS.chownSync(path, uid, gid)
       return true
     } catch (err) {
-      console.error(err)
+      console.error(err + '')
       return false
     }
   },
@@ -145,7 +143,7 @@ const Iofs = {
         }
         return false
       }
-      console.error(err)
+      console.error(err + '')
       return false
     }
   },
@@ -178,7 +176,7 @@ const Iofs = {
 
       return true
     } catch (err) {
-      console.error(err)
+      console.error(err + '')
       return false
     }
   },
@@ -202,7 +200,7 @@ const Iofs = {
       }
       return true
     } catch (err) {
-      console.error(err)
+      console.error(err + '')
       return false
     }
   },
@@ -215,7 +213,7 @@ const Iofs = {
     try {
       return FS.statSync(path)
     } catch (err) {
-      console.error(err)
+      console.error(err + '')
       return null
     }
   },
@@ -228,7 +226,7 @@ const Iofs = {
     try {
       return this.stat(path).isDirectory()
     } catch (err) {
-      console.error(err)
+      console.error(err + '')
       return false
     }
   },
@@ -258,7 +256,7 @@ const Iofs = {
       }
       return true
     } catch (err) {
-      console.error(err)
+      console.error(err + '')
       return false
     }
   },
