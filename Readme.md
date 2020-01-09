@@ -11,18 +11,18 @@
 + props
   - [origin](#origin)
 + methods
-  - [.cat(file)](#.catfile)
-  - [.ls(path, recursive)](#.lspath-recursive)
-  - [.echo(data, file, append, encode)](#.echodata-file-append-encode)
-  - [.chmod(path, mode)](#.chmodpath-mode)
-  - [.chown(path, uid, gid)](#.chownpath-uid-gid)
-  - [.mv(origin, target)](#.mvorigin-target)
-  - [.cp(origin, target)](#.cporigin-target)
-  - [.rm(origin)](#.rmorigin)
-  - [.stat(path)](#.statpath)
-  - [.isdir(path)](#.isdirpath)
-  - [.mkdir(dir, mode)](#.mkdirdir-mode)
-  - [.exists(path)](#.existspath)
+  - [.cat(file)](#catfile)
+  - [.ls(path, recursive)](#lspath-recursive)
+  - [.echo(data, file, append, encode)](#echodata-file-append-encode)
+  - [.chmod(path, mode)](#chmodpath-mode)
+  - [.chown(path, uid, gid)](#chownpath-uid-gid)
+  - [.mv(origin, target)](#mvorigin-target)
+  - [.cp(origin, target)](#cporigin-target)
+  - [.rm(origin)](#rmorigin)
+  - [.stat(path)](#statpath)
+  - [.isdir(path)](#isdirpath)
+  - [.mkdir(dir, mode)](#mkdirdir-mode)
+  - [.exists(path)](#existspath)
 
 
 ## 属性 
@@ -76,7 +76,7 @@ fs.echo('world', 'test.txt', true) // 不会覆盖, 只会追加到 test.txt中
 ---
 
 
-### chmod(path, mode)
+### .chmod(path, mode)
 > 修改文件&目录的权限.
 
 | 参数 | 类型 | 是否必须 | 说明 |
@@ -94,7 +94,7 @@ fs.chmod('test.txt', 0o777)
 ---
 
 
-### chown(path, uid, gid)
+### .chown(path, uid, gid)
 > 修改文件&目录的归属。
 
 | 参数 | 类型 | 是否必须 | 说明 |
@@ -110,7 +110,7 @@ fs.chmod('test.txt', 0o777)
 
 
 
-### mv(origin, target)
+### .mv(origin, target)
 > 移动文件&目录, 支持跨磁盘移动; 同时具备重命名功能。
 
 | 参数 | 类型 | 是否必须 | 说明 |
@@ -122,7 +122,7 @@ fs.chmod('test.txt', 0o777)
 ---
 
 
-### cp(origin, target)
+### .cp(origin, target)
 > 复制文件&目录, 支持跨磁盘复制。
 
 | 参数 | 类型 | 是否必须 | 说明 |
@@ -134,7 +134,7 @@ fs.chmod('test.txt', 0o777)
 ---
 
 
-### rm(origin)
+### .rm(origin)
 > 删除文件&目录
 
 | 参数 | 类型 | 是否必须 | 说明 |
@@ -153,7 +153,7 @@ fs.rm('./foo') // 整个目录删除
 
 
 
-### stat(path)
+### .stat(path)
 > 返回文件&目录的状态信息, 如修改时间, 文件大小等
 
 | 参数 | 类型 | 是否必须 | 说明 |
@@ -166,7 +166,7 @@ fs.rm('./foo') // 整个目录删除
 ---
 
 
-### isdir(path)
+### .isdir(path)
 > 判断指定目录是否为一个目录, 路径不存在或者不是目录都会返回 false.
 
 | 参数 | 类型 | 是否必须 | 说明 |
@@ -175,7 +175,7 @@ fs.rm('./foo') // 整个目录删除
 
 ---
 
-### mkdir(dir)
+### .mkdir(dir)
 > 创建目录, 会自动创建上级目录(如不存在)
 
 | 参数 | 类型 | 是否必须 | 说明 |
@@ -185,7 +185,7 @@ fs.rm('./foo') // 整个目录删除
 
 ---
 
-### exists(path)
+### .exists(path)
 > 判断文件&目录是否存在
 
 | 参数 | 类型 | 是否必须 | 说明 |
