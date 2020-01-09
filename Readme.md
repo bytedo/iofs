@@ -7,26 +7,44 @@
 [Change Logs](./History.md)
 
 
+## API
++ props
+  - [origin](#origin)
++ methods
+  - [.cat(file)](.cat)
+  - [.ls(path, recursive]](.ls)
+  - [.echo(data, file, append, encode)](.echo)
+  - [.chmod(path, mode)](.chmod)
+  - [.chown(path, uid, gid)](.chown)
+  - [.mv(origin, target)](.mv)
+  - [.cp(origin, target)](.cp)
+  - [.rm(origin)](.rm)
+  - [.stat(path)](.stat)
+  - [.isdir(path)](.isdir)
+  - [.mkdir(dir, mode)](.mkdir)
+  - [.exists(path)](.exists)
+
+
 ## 属性 
 
-- origin
+### origin
 > 返回原生的`fs`模块对象, 方便调用一些未封装的额外功能
 
 
 
 ## APIs
 
-- .cat()
+### .cat(file)
 > 读取文件, 返回一个`Buffer对象`
 
 | 参数 | 类型 | 是否必须 | 说明 |
 | :--: | :--: | :--: | -- |
 | file |  `<String>`  |  是  | 要读取的文件路径 |
 
+---
 
 
-
-- .ls()
+### .ls(path, recursive)
 > 列出指定目录下的所有文件&目录, 不包括 '.' and '..'. 结果返回一个数组.
 
 | 参数 | 类型 | 是否必须 | 说明 |
@@ -34,96 +52,142 @@
 | path |  `<String>`  |  是  | 要读取的目录 |
 | recursive |  `<String>`  |  否  | 是否递归读取 |
 
+---
 
-
-### echo(data, file[, append][, encode])
-- data `<String>` | `<Buffer>` | `<Number>`
-- file `<String>`
-- append `<Boolean>` optional
-- encode `<String>` optional
-
+### .echo(data, file, append, encode)
 > 写数据到指定文件中. 如果指定文件不存在, 则自动生成.
-> 如果`append`设为true, 则往文件后面追加数据, 不会覆盖.
-> `encode`为指定编码, 默认utf8.
+
+| 参数 | 类型 | 是否必须 | 说明 |
+| :--: | :--: | :--: | -- |
+| data |  `<String>` `<Buffer>` `<Number>` |  是  | 要写入的数据, 可以字符串、Buffer对象, 数字 |
+| file |  `<String>`  |  是  | 要写入的文件名, 不存在会自动创建, 如存在会覆盖 |
+| append |  `<Boolean>`  |  否  | 是否在文件后追加数据, 默认否, 即会整个文件替换 |
+| encode |  `<String>`  |  否  | 指定保存的编码, 默认utf8 |
+
 
 ```javascript
 var fs = require('iofs')
 
 fs.echo('hello ', 'test.txt') // 如果test.txt存在, 则覆盖.
-
 fs.echo('world', 'test.txt', true) // 不会覆盖, 只会追加到 test.txt中
 
 ```
 
+---
 
 
-
-### chmod(file, mode)
-- file `<String>` | `<Buffer>`
-- mode `<Integer>`
-
+### chmod(path, mode)
 > 修改文件&目录的权限.
+
+| 参数 | 类型 | 是否必须 | 说明 |
+| :--: | :--: | :--: | -- |
+| path |  `<String>`|  是  | 要修改的文件&目录路径 |
+| mode |  `<Number>`  |  是  | 权限码 `0o000 - 0o777` |
+
 
 ```javascript
 
-fs.chmod('test.txt', 777)
+fs.chmod('test.txt', 0o777)
 
 ```
 
-
-### mv(from, to)
-- from `<String>`
-- to `<String>`
-
-> 移动文件, 支持跨磁盘移动; 同时具备重命名功能。
+---
 
 
+### chown(path, uid, gid)
+> 修改文件&目录的归属。
 
-### cp(from, to)
-- from `<String>`
-- to `<String>`
-
-> 复制文件.
+| 参数 | 类型 | 是否必须 | 说明 |
+| :--: | :--: | :--: | -- |
+| path |  `<String>`|  是  | 要修改的文件&目录路径 |
+| uid |  `<Number>`  |  是  | 用户ID |
+| gid |  `<Number>`  |  是  | 用户组ID |
 
 
 
-### rm(path, recursion)
-- path `<String>`
-- recursion `<Boolean>`
+---
 
-> 删除文件, 如果要删除目录&子目录, `recursion`必须设为true.
+
+
+
+### mv(origin, target)
+> 移动文件&目录, 支持跨磁盘移动; 同时具备重命名功能。
+
+| 参数 | 类型 | 是否必须 | 说明 |
+| :--: | :--: | :--: | -- |
+| origin |  `<String>`|  是  | 要移动或重命名的文件&目录 |
+| target |  `<String>`  |  是  | 目标文件名&目录名 |
+
+
+---
+
+
+### cp(origin, target)
+> 复制文件&目录, 支持跨磁盘复制。
+
+| 参数 | 类型 | 是否必须 | 说明 |
+| :--: | :--: | :--: | -- |
+| origin |  `<String>`|  是  | 要复制的文件&目录 |
+| target |  `<String>`  |  是  | 目标文件名&目录名 |
+
+
+---
+
+
+### rm(origin)
+> 删除文件&目录
+
+| 参数 | 类型 | 是否必须 | 说明 |
+| :--: | :--: | :--: | -- |
+| origin |  `<String>`|  是  | 要删除的文件&目录 |
 
 ```javascript
 
 fs.rm('./foo/test.txt')
-
-fs.rm('./foo', true)
+fs.rm('./foo') // 整个目录删除
 
 ```
 
 
+---
+
+
 
 ### stat(path)
-- path `<String>`
+> 返回文件&目录的状态信息, 如修改时间, 文件大小等
 
-> 返回文件的状态信息, 如修改时间, 文件大小等
+| 参数 | 类型 | 是否必须 | 说明 |
+| :--: | :--: | :--: | -- |
+| path |  `<String>`|  是  | 要读取的目录&文件 |
+
+
+
+
+---
 
 
 ### isdir(path)
-- path `<String>`
-
 > 判断指定目录是否为一个目录, 路径不存在或者不是目录都会返回 false.
 
+| 参数 | 类型 | 是否必须 | 说明 |
+| :--: | :--: | :--: | -- |
+| path |  `<String>`|  是  | 要读取的目录路径 |
+
+---
+
+### mkdir(dir)
+> 创建目录, 会自动创建上级目录(如不存在)
+
+| 参数 | 类型 | 是否必须 | 说明 |
+| :--: | :--: | :--: | -- |
+| dir |  `<String>`|  是  | 要创建的目录名 |
 
 
-### mkdir(path)
-- path `<String>`
-
-> 创建目录, 可自动创建上级目录(如不存在)
-
-
+---
 
 ### exists(path)
-- path `<String>`
-
 > 判断文件&目录是否存在
+
+| 参数 | 类型 | 是否必须 | 说明 |
+| :--: | :--: | :--: | -- |
+| path |  `<String>`|  是  | 要读取的目录&文件 |
