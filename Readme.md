@@ -33,6 +33,7 @@
 
 
 ## APIs
+> 所有API均支持在最后传入一个 `silently<Boolean>`参数(v1.3.2新增), 用于静默执行, 不打印错误日志
 
 ### .cat(file)
 > 读取文件, 返回一个`Buffer对象`
