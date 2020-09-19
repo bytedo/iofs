@@ -1,16 +1,14 @@
 /**
- *
- * @authors yutent (yutent@doui.cc)
- * @date    2015-12-28 14:28:38
- *
+ * @author yutent<yutent.io@gmail.com>
+ * @date 2020/09/19 16:39:59
  */
 
-const FS = require('fs')
-const PATH = require('path')
+import FS from 'fs'
+import PATH from 'path'
 
 const VERSION = +process.versions.node.split('.').slice(0, 2).join('.')
 
-const Iofs = {
+export default {
   origin: FS,
 
   /**
@@ -265,5 +263,3 @@ const Iofs = {
     return FS.existsSync(file)
   }
 }
-
-module.exports = Iofs

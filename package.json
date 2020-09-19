@@ -1,11 +1,11 @@
 {
   "name": "iofs",
-  "version": "1.3.2",
-  "description": "Base on native fs module, for easy using.",
+  "version": "1.4.0",
+  "description": "iofs是一个基于原生fs模块封装的工具, 旨在提供更加方便实用一些常用的API方法(同步), API习惯参考了bash shell。",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yutent/iofs.git"
+    "url": "https://github.com/bytedo/iofs.git"
   },
   "keywords": [
     "fivejs",
