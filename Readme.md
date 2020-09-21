@@ -3,9 +3,6 @@
 # iofs
 > `iofs`是一个基于原生`fs`模块封装的工具, 旨在提供更加方便实用一些常用的API方法(同步), API习惯参考了`bash shell`, 习惯用命令行的朋友, 可能会比较亲切。
 
-## 更新日志
-[Change Logs](./History.md)
-
 
 ## API
 + props
@@ -21,8 +18,10 @@
   - [.rm(origin)](#rmorigin)
   - [.stat(path)](#statpath)
   - [.isdir(path)](#isdirpath)
+  - [.isfile(path)](#isfilepath)
   - [.mkdir(dir, mode)](#mkdirdir-mode)
   - [.exists(path)](#existspath)
+  - [.is(path)](#isspath-mode)
 
 
 ## 属性 
@@ -33,7 +32,7 @@
 
 
 ## APIs
-> 所有API均支持在最后传入一个 `silently<Boolean>`参数(v1.3.2新增), 用于静默执行, 不打印错误日志
+> 所有API均支持在最后传入一个 `debug<Boolean>`参数(v1.3.2新增), 用于打印错误日志
 
 ### .cat(file)
 > 读取文件, 返回一个`Buffer对象`
@@ -180,6 +179,15 @@ fs.rm('./foo') // 整个目录删除
 
 ---
 
+### .isfile(path)
+> 判断指定目录是否为一个文件, 路径不存在或者不是文件都会返回 false
+
+| 参数 | 类型 | 是否必须 | 说明 |
+| :--: | :--: | :--: | -- |
+| path |  `<String>`|  是  | 要读取的文件 |
+
+---
+
 ### .mkdir(dir)
 > 创建目录, 会自动创建上级目录(如不存在)
 
@@ -196,3 +204,16 @@ fs.rm('./foo') // 整个目录删除
 | 参数 | 类型 | 是否必须 | 说明 |
 | :--: | :--: | :--: | -- |
 | path |  `<String>`|  是  | 要读取的目录&文件 |
+
+
+---
+
+### .is(path, mode)
+> 判断文件&目录是否存在
+
+| 参数 | 类型 | 是否必须 | 说明 |
+| :--: | :--: | :--: | -- |
+| path |  `<String>`|  是  | 要读取的目录&文件 |
+| mode |  `<Number>`|  否  | 如 r: 4, w: 2, rw: 6 |
+
+

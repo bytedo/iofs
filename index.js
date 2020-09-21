@@ -6,7 +6,27 @@
 const FS = require('fs')
 const PATH = require('path')
 
-const VERSION = +process.versions.node.split('.').slice(0, 2).join('.')
+class Stats {
+  isFile() {
+    return false
+  }
+  isDirectory() {
+    return false
+  }
+  isSocket() {
+    return false
+  }
+  isSymbolicLink() {
+    return false
+  }
+}
+
+const VERSION = +process.versions.node
+  .split('.')
+  .slice(0, 2)
+  .join('.')
+
+const EMPTY_STAT = new Stats()
 
 const Iofs = {
   origin: FS,
@@ -16,11 +36,11 @@ const Iofs = {
    * @param  {String} file [文件路径]
    * @param  {Function} cb   [回调] 可选
    */
-  cat(file, silently) {
+  cat(file, debug) {
     try {
       return FS.readFileSync(file)
     } catch (err) {
-      !silently && console.error('call cat(): ', err + '')
+      debug && console.error('call cat(): ', err + '')
       return null
     }
   },
@@ -31,7 +51,7 @@ const Iofs = {
    * @param  {boolean} recursive [是否递归遍历子目录]
    * @return {array}      [返回目标目录所有文件名和子目录名, 不包括'.'和'..']
    */
-  ls(dir, recursive, silently) {
+  ls(dir, recursive, debug) {
     try {
       var list = FS.readdirSync(dir)
 
@@ -43,13 +63,13 @@ const Iofs = {
         var tmp = list.concat()
         tmp.forEach(it => {
           if (this.isdir(it)) {
-            list = list.concat(this.ls(it, true))
+            list = list.concat(this.ls(it))
           }
         })
       }
       return list
     } catch (err) {
-      !silently && console.error('call ls(): ', err + '')
+      debug && console.error('call ls(): ', err + '')
       return null
     }
   },
@@ -61,7 +81,7 @@ const Iofs = {
    * @param  {Boolean} append [是否在后面追加，默认否]
    * @param  {String} encode [编码, 默认utf8]
    */
-  echo(data, file, append, encode, silently) {
+  echo(data, file, append, encode, debug) {
     if (!file) {
       return data
     }
@@ -90,29 +110,29 @@ const Iofs = {
       }
       return true
     } catch (err) {
-      !silently && console.error('call echo(): ', err + '')
+      debug && console.error('call echo(): ', err + '')
       return false
     }
   },
 
   //修改权限
-  chmod(path, mode, silently) {
+  chmod(path, mode, debug) {
     try {
       FS.chmodSync(path, mode)
       return true
     } catch (err) {
-      !silently && console.error('call chmod(): ', err + '')
+      debug && console.error('call chmod(): ', err + '')
       return false
     }
   },
 
   //修改所属用户
-  chown(path, uid, gid, silently) {
+  chown(path, uid, gid, debug) {
     try {
       FS.chownSync(path, uid, gid)
       return true
     } catch (err) {
-      !silently && console.error('call chown(): ', err + '')
+      debug && console.error('call chown(): ', err + '')
       return false
     }
   },
@@ -122,7 +142,7 @@ const Iofs = {
    * @param  {String} origin [原路径/原名]
    * @param  {String} target   [目标路径/新名]
    */
-  mv(origin, target, silently) {
+  mv(origin, target, debug) {
     var updir = PATH.parse(target).dir
     if (!this.isdir(updir)) {
       this.mkdir(updir)
@@ -137,7 +157,7 @@ const Iofs = {
         }
         return false
       }
-      !silently && console.error('call mv(): ', err + '')
+      debug && console.error('call mv(): ', err + '')
       return false
     }
   },
@@ -147,7 +167,7 @@ const Iofs = {
    * @param  {String} origin [原路径]
    * @param  {String} target   [目标路径]
    */
-  cp(origin, target, silently) {
+  cp(origin, target, debug) {
     try {
       // 如果是目录, 则递归操作
       if (this.isdir(origin)) {
@@ -170,7 +190,7 @@ const Iofs = {
 
       return true
     } catch (err) {
-      !silently && console.error('call cp(): ', err + '')
+      debug && console.error('call cp(): ', err + '')
       return false
     }
   },
@@ -179,7 +199,7 @@ const Iofs = {
    * [rm 删除文件/目录]
    * @param  {[type]} origin      [源文件/目录路径]
    */
-  rm(origin, silently) {
+  rm(origin, debug) {
     try {
       if (this.isdir(origin)) {
         if (VERSION > 12.1) {
@@ -194,7 +214,7 @@ const Iofs = {
       }
       return true
     } catch (err) {
-      !silently && console.error('call rm(): ', err + '')
+      debug && console.error('call rm(): ', err + '')
       return false
     }
   },
@@ -202,14 +222,14 @@ const Iofs = {
   /**
    * [stat 返回文件/目录的状态信息]
    * @param  {[string]} path [目标路径]
-   * @param  {[boolean]} silently [是否静默检测, 是否不打印错误日志]
+   * @param  {[boolean]} debug [是否静默检测, 是否不打印错误日志]
    */
-  stat(path, silently) {
+  stat(path, debug) {
     try {
       return FS.statSync(path)
     } catch (err) {
-      !silently && console.error('call stat(): ', err + '')
-      return Object.create(null)
+      debug && console.error('call stat(): ', err + '')
+      return EMPTY_STAT
     }
   },
 
@@ -219,7 +239,15 @@ const Iofs = {
    */
   isdir(path) {
     try {
-      return this.stat(path, true).isDirectory()
+      return this.stat(path).isDirectory()
+    } catch (err) {
+      return false
+    }
+  },
+
+  isfile(path) {
+    try {
+      return this.stat(path).isFile()
     } catch (err) {
       return false
     }
@@ -230,14 +258,14 @@ const Iofs = {
    * @param  {String} dir [目标路径]
    * @param {Number} mode [目录权限, node v10.12起支持]
    */
-  mkdir(dir, mode = 0o755, silently) {
+  mkdir(dir, mode = 0o755, debug) {
     try {
       if (VERSION > 10.12) {
         FS.mkdirSync(dir, { recursive: true, mode: mode })
       } else {
         var updir = PATH.parse(dir).dir
         if (!updir) {
-          !silently && console.error('call mkdir(): ', 'Wrong dir path')
+          debug && console.error('call mkdir(): ', 'Wrong dir path')
           return false
         }
 
@@ -250,7 +278,7 @@ const Iofs = {
       }
       return true
     } catch (err) {
-      !silently && console.error('call mkdir(): ', err + '')
+      debug && console.error('call mkdir(): ', err + '')
       return false
     }
   },
@@ -260,7 +288,17 @@ const Iofs = {
    * @param  {String} file [目标路径]
    */
   exists(file) {
-    return FS.existsSync(file)
+    return this.is(file, FS.constants.R_OK)
+  },
+
+  // 是否可读写
+  is(file, mode) {
+    try {
+      FS.accessSync(file, mode)
+      return true
+    } catch (e) {
+      return false
+    }
   }
 }
 
