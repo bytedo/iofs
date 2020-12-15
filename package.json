@@ -1,19 +1,13 @@
 {
   "name": "iofs",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "iofs是一个基于原生fs模块封装的工具, 旨在提供更加方便实用一些常用的API方法(同步), API习惯参考了bash shell。",
   "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/bytedo/iofs.git"
   },
-  "keywords": [
-    "fivejs",
-    "fs",
-    "iofs",
-    "fs.io",
-    "file"
-  ],
+  "keywords": ["fivejs", "fs", "iofs", "fs.io", "file"],
   "author": "yutent",
   "license": "MIT"
 }
