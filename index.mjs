@@ -63,7 +63,7 @@ export default {
         var tmp = list.concat()
         tmp.forEach(it => {
           if (this.isdir(it)) {
-            list = list.concat(this.ls(it))
+            list = list.concat(this.ls(it, recursive))
           }
         })
       }
