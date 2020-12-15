@@ -21,10 +21,7 @@ class STATS {
   }
 }
 
-const VERSION = +process.versions.node
-  .split('.')
-  .slice(0, 2)
-  .join('.')
+const VERSION = +process.versions.node.split('.').slice(0, 2).join('.')
 
 const EMPTY_STAT = new STATS()
 
@@ -288,7 +285,7 @@ export default {
    * @param  {String} file [目标路径]
    */
   exists(file) {
-    return this.is(file, FS.constants.R_OK)
+    return this.is(file, FS.constants.F_OK)
   },
 
   // 是否可读写
