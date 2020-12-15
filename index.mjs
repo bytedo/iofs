@@ -21,7 +21,10 @@ class STATS {
   }
 }
 
-const VERSION = +process.versions.node.split('.').slice(0, 2).join('.')
+const VERSION = +process.versions.node
+  .split('.')
+  .slice(0, 2)
+  .join('.')
 
 const EMPTY_STAT = new STATS()
 
